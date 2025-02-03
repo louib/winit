@@ -16,7 +16,7 @@ use sctk::reexports::client::{Connection, Dispatch, Proxy, QueueHandle, WEnum};
 use crate::event::{ElementState, WindowEvent};
 use crate::keyboard::ModifiersState;
 
-use crate::platform_impl::common::xkb::Context;
+// use crate::platform_impl::common::xkb::Context;
 use crate::platform_impl::wayland::event_loop::sink::EventSink;
 use crate::platform_impl::wayland::state::WinitState;
 use crate::platform_impl::wayland::{self, DeviceId, WindowId};
@@ -52,8 +52,8 @@ impl Dispatch<WlKeyboard, KeyboardData, WinitState> for WinitState {
                         warn!("non-xkb compatible keymap")
                     },
                     WlKeymapFormat::XkbV1 => {
-                        let context = &mut keyboard_state.xkb_context;
-                        context.set_keymap_from_fd(fd, size as usize);
+                        // let context = &mut keyboard_state.xkb_context;
+                        // context.set_keymap_from_fd(fd, size as usize);
                     },
                     _ => unreachable!(),
                 },
@@ -148,9 +148,9 @@ impl Dispatch<WlKeyboard, KeyboardData, WinitState> for WinitState {
                     RepeatInfo::Disable => return,
                 };
 
-                if !keyboard_state.xkb_context.keymap_mut().unwrap().key_repeats(key) {
-                    return;
-                }
+                // if !keyboard_state.xkb_context.keymap_mut().unwrap().key_repeats(key) {
+                //     return;
+                // }
 
                 keyboard_state.current_repeat = Some(key);
 
@@ -215,41 +215,41 @@ impl Dispatch<WlKeyboard, KeyboardData, WinitState> for WinitState {
                     false,
                 );
 
-                if keyboard_state.repeat_info != RepeatInfo::Disable
-                    && keyboard_state.xkb_context.keymap_mut().unwrap().key_repeats(key)
-                    && Some(key) == keyboard_state.current_repeat
-                {
-                    keyboard_state.current_repeat = None;
-                    if let Some(token) = keyboard_state.repeat_token.take() {
-                        keyboard_state.loop_handle.remove(token);
-                    }
-                }
+                // if keyboard_state.repeat_info != RepeatInfo::Disable
+                //     && keyboard_state.xkb_context.keymap_mut().unwrap().key_repeats(key)
+                //     && Some(key) == keyboard_state.current_repeat
+                // {
+                //     keyboard_state.current_repeat = None;
+                //     if let Some(token) = keyboard_state.repeat_token.take() {
+                //         keyboard_state.loop_handle.remove(token);
+                //     }
+                // }
             },
             WlKeyboardEvent::Modifiers {
                 mods_depressed, mods_latched, mods_locked, group, ..
             } => {
-                let xkb_context = &mut keyboard_state.xkb_context;
-                let xkb_state = match xkb_context.state_mut() {
-                    Some(state) => state,
-                    None => return,
-                };
+                // let xkb_context = &mut keyboard_state.xkb_context;
+                // let xkb_state = match xkb_context.state_mut() {
+                //     Some(state) => state,
+                //     None => return,
+                // };
 
-                xkb_state.update_modifiers(mods_depressed, mods_latched, mods_locked, 0, 0, group);
-                seat_state.modifiers = xkb_state.modifiers().into();
+                // xkb_state.update_modifiers(mods_depressed, mods_latched, mods_locked, 0, 0, group);
+                // seat_state.modifiers = xkb_state.modifiers().into();
 
-                // HACK: part of the workaround from `WlKeyboardEvent::Enter`.
-                let window_id = match *data.window_id.lock().unwrap() {
-                    Some(window_id) => window_id,
-                    None => {
-                        seat_state.modifiers_pending = true;
-                        return;
-                    },
-                };
+                // // HACK: part of the workaround from `WlKeyboardEvent::Enter`.
+                // let window_id = match *data.window_id.lock().unwrap() {
+                //     Some(window_id) => window_id,
+                //     None => {
+                //         seat_state.modifiers_pending = true;
+                //         return;
+                //     },
+                // };
 
-                state.events_sink.push_window_event(
-                    WindowEvent::ModifiersChanged(seat_state.modifiers.into()),
-                    window_id,
-                );
+                // state.events_sink.push_window_event(
+                //     WindowEvent::ModifiersChanged(seat_state.modifiers.into()),
+                //     window_id,
+                // );
             },
             WlKeyboardEvent::RepeatInfo { rate, delay } => {
                 keyboard_state.repeat_info = if rate == 0 {
@@ -280,7 +280,7 @@ pub struct KeyboardState {
     pub loop_handle: LoopHandle<'static, WinitState>,
 
     /// The state of the keyboard.
-    pub xkb_context: Context,
+    // pub xkb_context: Context,
 
     /// The information about the repeat rate obtained from the compositor.
     pub repeat_info: RepeatInfo,
@@ -297,7 +297,7 @@ impl KeyboardState {
         Self {
             keyboard,
             loop_handle,
-            xkb_context: Context::new().unwrap(),
+            //            xkb_context: Context::new().unwrap(),
             repeat_info: RepeatInfo::default(),
             repeat_token: None,
             current_repeat: None,
@@ -372,9 +372,9 @@ fn key_input(
     };
 
     let device_id = crate::event::DeviceId(crate::platform_impl::DeviceId::Wayland(DeviceId));
-    if let Some(mut key_context) = keyboard_state.xkb_context.key_context() {
-        let event = key_context.process_key_event(keycode, state, repeat);
-        let event = WindowEvent::KeyboardInput { device_id, event, is_synthetic: false };
-        event_sink.push_window_event(event, window_id);
-    }
+    // if let Some(mut key_context) = keyboard_state.xkb_context.key_context() {
+    //     let event = key_context.process_key_event(keycode, state, repeat);
+    //     let event = WindowEvent::KeyboardInput { device_id, event, is_synthetic: false };
+    //     event_sink.push_window_event(event, window_id);
+    // }
 }

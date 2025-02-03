@@ -23,7 +23,7 @@ use crate::event_loop::{
     ActiveEventLoop as RootELW, AsyncRequestSerial, ControlFlow, DeviceEvents, EventLoopClosed,
 };
 use crate::icon::Icon;
-use crate::keyboard::Key;
+use crate::keyboard::{Key, KeyCode, PhysicalKey};
 use crate::platform::pump_events::PumpStatus;
 #[cfg(x11_platform)]
 use crate::platform::x11::{WindowType as XWindowType, XlibErrorHook};
@@ -32,7 +32,7 @@ use crate::window::{
     ResizeDirection, Theme, UserAttentionType, WindowAttributes, WindowButtons, WindowLevel,
 };
 
-pub(crate) use self::common::xkb::{physicalkey_to_scancode, scancode_to_physicalkey};
+// pub(crate) use self::common::xkb::{physicalkey_to_scancode, scancode_to_physicalkey};
 pub(crate) use crate::cursor::OnlyCursorImageSource as PlatformCustomCursorSource;
 pub(crate) use crate::icon::RgbaIcon as PlatformIcon;
 pub(crate) use crate::platform_impl::Fullscreen;
@@ -42,6 +42,14 @@ pub(crate) mod common;
 pub(crate) mod wayland;
 #[cfg(x11_platform)]
 pub(crate) mod x11;
+
+pub(crate) fn physicalkey_to_scancode(physical_key: PhysicalKey) -> Option<u32> {
+    Some(0)
+}
+
+pub fn scancode_to_physicalkey(scancode: u32) -> PhysicalKey {
+    PhysicalKey::Code(KeyCode::Fn)
+}
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum Backend {
@@ -519,7 +527,7 @@ impl Window {
 
     #[inline]
     pub fn reset_dead_keys(&self) {
-        common::xkb::reset_dead_keys()
+        // common::xkb::reset_dead_keys()
     }
 
     #[inline]
